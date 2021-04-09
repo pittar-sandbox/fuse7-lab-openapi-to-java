@@ -12,12 +12,32 @@
             "get": {
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/book"
+                        "$ref": "#/components/responses/books"
                     }
                 },
                 "operationId": "get_books",
                 "summary": "Get the list of all books.",
                 "description": "Get all books."
+            },
+            "post": {
+                "requestBody": {
+                    "description": "New book details.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/book"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/book"
+                    }
+                },
+                "operationId": "new_book",
+                "description": "Create a new book."
             }
         },
         "/books/{isbn}": {
@@ -91,7 +111,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "$ref": "#/components/responses/order"
                     }
                 },
@@ -210,28 +230,6 @@
                     "genre": "Horror"
                 }
             },
-            "item": {
-                "description": "Book order.",
-                "required": [
-                    "isbn",
-                    "quantity"
-                ],
-                "type": "object",
-                "properties": {
-                    "isbn": {
-                        "description": "ISBN of the book being ordered.",
-                        "type": "string"
-                    },
-                    "quantity": {
-                        "description": "Quantity of the book being ordered.",
-                        "type": "integer"
-                    }
-                },
-                "example": {
-                    "isbn": "123456",
-                    "quantity": 1
-                }
-            },
             "order": {
                 "description": "A book order.",
                 "required": [
@@ -264,6 +262,29 @@
                         }
                     ],
                     "id": 1
+                }
+            },
+            "item": {
+                "description": "Book order.",
+                "required": [
+                    "isbn",
+                    "quantity"
+                ],
+                "type": "object",
+                "properties": {
+                    "isbn": {
+                        "description": "ISBN of the book being ordered.",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Quantity of the book being ordered.",
+                        "minimum": 1,
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "isbn": "123456",
+                    "quantity": 1
                 }
             }
         },
@@ -406,6 +427,39 @@
                     }
                 },
                 "description": "Order ID response."
+            },
+            "books": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/book"
+                            }
+                        },
+                        "examples": {
+                            "books": {
+                                "value": [
+                                    {
+                                        "isbn": "123456",
+                                        "title": "Cujo",
+                                        "author": "Stephen King",
+                                        "publisher": "Scribner",
+                                        "genre": "Horror"
+                                    },
+                                    {
+                                        "isbn": "789021",
+                                        "title": "The Outsider",
+                                        "author": "Stephen King",
+                                        "publisher": "Scribner",
+                                        "genre": "Horror"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "description": "A list of books"
             }
         }
     }

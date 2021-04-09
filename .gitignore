@@ -31,3 +31,6 @@ target/
 .mvn
 .theia
 mvnw
+
+# OSX
+.DS_Store

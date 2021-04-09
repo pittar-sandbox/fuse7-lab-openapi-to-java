@@ -43,7 +43,7 @@ commands:
     actions:
       - workdir: '${CHE_PROJECTS_ROOT}/fuse-openapi-to-java'
         type: exec
-        command: MAVEN_OPTS='-Xmx200m' && mvn camel-restdsl-openapi:generate
+        command: MAVEN_OPTS='-Xmx200m' && mvn camel-restdsl-openapi:generate-with-dto
         component: maven
   - name: 1. Build
     actions:
