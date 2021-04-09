@@ -15,19 +15,21 @@ public class ServiceRoute extends RouteBuilder {
     public void configure() throws Exception {
 
         from("direct:get_books")
-                .to(jpa(Book.class, "findAll"))
+                .to(jpa(Book.class, "findAllBooks"))
+                .process(UtilConverter::booksToDto)
                 .marshal(new JacksonDataFormat(BookDto[].class));
 
         from("direct:new_book")
                 .unmarshal(new JacksonDataFormat(BookDto.class))
-                .process(EntityConverter::bookFromDto)
+                .process(UtilConverter::bookFromDto)
                 .to(jpaUpdate(Book.class))
-                .process(EntityConverter::bookToDto)
+                .process(UtilConverter::bookToDto)
                 .marshal(new JacksonDataFormat(BookDto.class));
 
         from("direct:get_book_by_isbn")
                 .process(e -> setParameters(e, "isbn", "isbn"))
-                .to(jpa(Book.class, "findByIsbn"))
+                .to(jpa(Book.class, "findBookByIsbn"))
+                .process(UtilConverter::bookToDto)
                 .marshal(new JacksonDataFormat(BookDto.class));
     }
 

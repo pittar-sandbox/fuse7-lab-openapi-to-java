@@ -46,7 +46,7 @@
             "get": {
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/isbn"
+                        "$ref": "#/components/responses/book"
                     }
                 },
                 "operationId": "get_book_by_isbn",
@@ -82,6 +82,30 @@
                 "summary": "Get all orders.",
                 "description": "Get all orders."
             },
+            "put": {
+                "requestBody": {
+                    "description": "New order data",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/order"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Order updated"
+                    },
+                    "201": {
+                        "$ref": "#/components/responses/order"
+                    }
+                },
+                "operationId": "update_order",
+                "summary": "Update an order",
+                "description": "Update an order"
+            },
             "post": {
                 "requestBody": {
                     "description": "New order details.",
@@ -93,16 +117,8 @@
                             "examples": {
                                 "orders": {
                                     "value": {
-                                        "items": [
-                                            {
-                                                "isbn": "123456",
-                                                "quantity": 1
-                                            },
-                                            {
-                                                "isbn": "345678",
-                                                "quantity": 1
-                                            }
-                                        ]
+                                        "id": 1,
+                                        "orderDate": "2021-04-04"
                                     }
                                 }
                             }
@@ -124,51 +140,30 @@
             "summary": "Operations on a specific order.",
             "description": "Get or update a specific order.",
             "get": {
+                "parameters": [
+                    {
+                        "examples": {
+                            "orderId": {
+                                "value": "123e4567-e89b-12d3-a456-426614174000"
+                            }
+                        },
+                        "name": "orderId",
+                        "description": "Order ID.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/orderId"
+                        "$ref": "#/components/responses/order"
                     }
                 },
                 "operationId": "get_order_by_id",
                 "summary": "Get an order by ID.",
                 "description": "Get an order by order id."
-            },
-            "put": {
-                "requestBody": {
-                    "description": "Updated order.",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/order"
-                            },
-                            "examples": {
-                                "order": {
-                                    "value": {
-                                        "items": [
-                                            {
-                                                "isbn": "123456",
-                                                "quantity": 1
-                                            },
-                                            {
-                                                "isbn": "345678",
-                                                "quantity": 1
-                                            }
-                                        ],
-                                        "id": 1
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "$ref": "#/components/responses/orderId"
-                    }
-                },
-                "operationId": "update_order",
-                "description": "Update an order by ID."
             },
             "parameters": [
                 {
@@ -186,6 +181,34 @@
                     "required": true
                 }
             ]
+        },
+        "/orders/{orderId}/items": {
+            "get": {
+                "parameters": [
+                    {
+                        "examples": {
+                            "orderId": {
+                                "value": "123e4567-e89b-12d3-a456-426614174000"
+                            }
+                        },
+                        "name": "orderId",
+                        "description": "Order ID",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/items"
+                    }
+                },
+                "operationId": "get_order_items",
+                "summary": "Get the list of all items for specific order.",
+                "description": "Get the list of all items for specific order."
+            }
         }
     },
     "components": {
@@ -233,42 +256,32 @@
             "order": {
                 "description": "A book order.",
                 "required": [
-                    "items",
-                    "id"
+                    "id",
+                    "orderDate"
                 ],
                 "type": "object",
                 "properties": {
-                    "items": {
-                        "description": "List of order items.",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/item"
-                        }
-                    },
                     "id": {
                         "description": "Unique order ID.",
-                        "type": "integer"
+                        "type": "string"
+                    },
+                    "orderDate": {
+                        "format": "date",
+                        "description": "Order date",
+                        "type": "string"
                     }
                 },
                 "example": {
-                    "items": [
-                        {
-                            "isbn": "123456",
-                            "quantity": 1
-                        },
-                        {
-                            "isbn": "345678",
-                            "quantity": 1
-                        }
-                    ],
-                    "id": 1
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "orderDate": "2021-04-04"
                 }
             },
             "item": {
                 "description": "Book order.",
                 "required": [
                     "isbn",
-                    "quantity"
+                    "quantity",
+                    "itemId"
                 ],
                 "type": "object",
                 "properties": {
@@ -280,9 +293,14 @@
                         "description": "Quantity of the book being ordered.",
                         "minimum": 1,
                         "type": "integer"
+                    },
+                    "itemId": {
+                        "description": "Unique item ID",
+                        "type": "string"
                     }
                 },
                 "example": {
+                    "id": "123e4567-e89b-12d3-a456-426614174111",
                     "isbn": "123456",
                     "quantity": 1
                 }
@@ -319,16 +337,8 @@
                         "examples": {
                             "order": {
                                 "value": {
-                                    "items": [
-                                        {
-                                            "isbn": "123456",
-                                            "quantity": 1
-                                        },
-                                        {
-                                            "isbn": "345678",
-                                            "quantity": 1
-                                        }
-                                    ]
+                                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                                    "orderDate": "2021-04-04"
                                 }
                             }
                         }
@@ -349,30 +359,12 @@
                             "orders": {
                                 "value": [
                                     {
-                                        "items": [
-                                            {
-                                                "isbn": "123456",
-                                                "quantity": 1
-                                            },
-                                            {
-                                                "isbn": "345678",
-                                                "quantity": 1
-                                            }
-                                        ],
-                                        "id": 1
+                                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                                        "orderDate": "2021-04-04"
                                     },
                                     {
-                                        "items": [
-                                            {
-                                                "isbn": "234567",
-                                                "quantity": 20
-                                            },
-                                            {
-                                                "isbn": "987654",
-                                                "quantity": 1
-                                            }
-                                        ],
-                                        "id": 2
+                                        "id": "123e4567-e89b-12d3-a456-426614174999",
+                                        "orderDate": "2021-04-04"
                                     }
                                 ]
                             }
@@ -380,53 +372,6 @@
                     }
                 },
                 "description": "A list of orders."
-            },
-            "isbn": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/book"
-                        },
-                        "examples": {
-                            "isbn": {
-                                "value": {
-                                    "isbn": "123456",
-                                    "title": "Cujo",
-                                    "author": "Stephen King",
-                                    "publisher": "Scribner",
-                                    "genre": "Horror"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "Book by ISBN."
-            },
-            "orderId": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/order"
-                        },
-                        "examples": {
-                            "orderId": {
-                                "value": {
-                                    "items": [
-                                        {
-                                            "isbn": "123456",
-                                            "quantity": 1
-                                        },
-                                        {
-                                            "isbn": "345678",
-                                            "quantity": 1
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "Order ID response."
             },
             "books": {
                 "content": {
@@ -460,6 +405,35 @@
                     }
                 },
                 "description": "A list of books"
+            },
+            "items": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/item"
+                            }
+                        },
+                        "examples": {
+                            "items": {
+                                "value": [
+                                    {
+                                        "id": "123e4567-e89b-12d3-a456-426614174111",
+                                        "isbn": "222222",
+                                        "quantity": 1
+                                    },
+                                    {
+                                        "id": "123e4567-e89b-12d3-a456-426614174222",
+                                        "isbn": "111111",
+                                        "quantity": 1
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "description": "List of items"
             }
         }
     }

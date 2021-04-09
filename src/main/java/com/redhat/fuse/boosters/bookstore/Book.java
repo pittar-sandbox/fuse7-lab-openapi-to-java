@@ -6,10 +6,12 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 @Entity
-@NamedQuery(name = "findAll", query = "select b from Book b")
-@NamedQuery(name = "findByIsbn", query = "select b from Book b where b.isbn = :isbn")
+@Table(name = "books")
+@NamedQuery(name = "findAllBooks", query = "select b from Book b")
+@NamedQuery(name = "findBookByIsbn", query = "select b from Book b where b.isbn = :isbn")
 public class Book implements Serializable {
 
     @Id
