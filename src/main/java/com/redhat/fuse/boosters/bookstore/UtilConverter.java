@@ -1,36 +1,39 @@
 package com.redhat.fuse.boosters.bookstore;
 
-import com.redhat.fuse.boosters.bookstore.dto.BookDto;
 import org.apache.camel.Exchange;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UtilConverter {
 
-    public static void bookFromDto(Exchange exchange) {
-        BookDto dto = exchange.getIn().getBody(BookDto.class);
-        Book book = new Book();
-        BeanUtils.copyProperties(dto, book);
-        exchange.getIn().setBody(book);
+    public static <T, S> void entityFromDto(Exchange exchange, Class<T>  classEntity, Class<S>  classDto) throws Exception {
+        Object dto = exchange.getIn().getBody(classDto);
+        T entity = (T) classEntity.getDeclaredConstructor().newInstance();
+        BeanUtils.copyProperties(dto, entity);
+        exchange.getIn().setBody(entity);
     }
 
-    public static void bookToDto(Exchange exchange) {
-        Book book = exchange.getIn().getBody(Book.class);
-        BookDto dto = bookToDto(book);
+    public static <T, S> void entityToDto(Exchange exchange, Class<T>  classEntity, Class<S>  classDto) throws Exception {
+        T entity = exchange.getIn().getBody(classEntity);
+        S dto = entityToDto(entity, classDto);
         exchange.getIn().setBody(dto);
     }
 
-    public static void booksToDto(Exchange exchange) {
-        List<Book> books = exchange.getIn().getBody(List.class);
-        List<BookDto> dtos = books.stream().map(UtilConverter::bookToDto).collect(Collectors.toList());
+    public static <T, S> void entitiesToDto(Exchange exchange, Class<T>  classEntity, Class<S>  classDto) throws Exception {
+        List<T> entities = exchange.getIn().getBody(List.class);
+        List<S> dtos = new ArrayList<>(entities.size());
+        for(T entity : entities){
+            S dto = entityToDto(entity, classDto);
+            dtos.add(dto);
+        }
         exchange.getIn().setBody(dtos);
     }
 
-    private static BookDto bookToDto(Book book){
-        BookDto dto = new BookDto();
-        BeanUtils.copyProperties(book, dto);
+    private static <T, S>  S entityToDto(T entity, Class<S> dtoClass) throws Exception {
+        S dto = dtoClass.getDeclaredConstructor().newInstance();
+        BeanUtils.copyProperties(entity, dto);
         return dto;
     }
 }

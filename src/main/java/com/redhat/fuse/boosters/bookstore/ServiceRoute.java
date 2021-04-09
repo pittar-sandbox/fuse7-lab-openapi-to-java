@@ -16,20 +16,20 @@ public class ServiceRoute extends RouteBuilder {
 
         from("direct:get_books")
                 .to(jpa(Book.class, "findAllBooks"))
-                .process(UtilConverter::booksToDto)
+                .process(e -> UtilConverter.entitiesToDto(e, Book.class, BookDto.class))
                 .marshal(new JacksonDataFormat(BookDto[].class));
 
         from("direct:new_book")
                 .unmarshal(new JacksonDataFormat(BookDto.class))
-                .process(UtilConverter::bookFromDto)
+                .process(e -> UtilConverter.entityFromDto(e, Book.class, BookDto.class))
                 .to(jpaUpdate(Book.class))
-                .process(UtilConverter::bookToDto)
+                .process(e -> UtilConverter.entityToDto(e, Book.class, BookDto.class))
                 .marshal(new JacksonDataFormat(BookDto.class));
 
         from("direct:get_book_by_isbn")
                 .process(e -> setParameters(e, "isbn", "isbn"))
                 .to(jpa(Book.class, "findBookByIsbn"))
-                .process(UtilConverter::bookToDto)
+                .process(e -> UtilConverter.entityToDto(e, Book.class, BookDto.class))
                 .marshal(new JacksonDataFormat(BookDto.class));
     }
 
