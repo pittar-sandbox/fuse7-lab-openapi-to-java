@@ -140,22 +140,6 @@
             "summary": "Operations on a specific order.",
             "description": "Get or update a specific order.",
             "get": {
-                "parameters": [
-                    {
-                        "examples": {
-                            "orderId": {
-                                "value": "123e4567-e89b-12d3-a456-426614174000"
-                            }
-                        },
-                        "name": "orderId",
-                        "description": "Order ID.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "$ref": "#/components/responses/order"
@@ -175,7 +159,7 @@
                     "name": "orderId",
                     "description": "Order ID.",
                     "schema": {
-                        "type": "integer"
+                        "type": "string"
                     },
                     "in": "path",
                     "required": true
@@ -183,6 +167,8 @@
             ]
         },
         "/orders/{orderId}/items": {
+            "summary": "Operation on items",
+            "description": "Operation on items",
             "get": {
                 "parameters": [
                     {
@@ -208,7 +194,52 @@
                 "operationId": "get_order_items",
                 "summary": "Get the list of all items for specific order.",
                 "description": "Get the list of all items for specific order."
-            }
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/item"
+                            },
+                            "examples": {
+                                "item": {
+                                    "value": {
+                                        "id": "123e4567-e89b-12d3-a456-426614174222",
+                                        "isbn": "111111",
+                                        "quantity": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/item"
+                    }
+                },
+                "operationId": "new_item",
+                "summary": "Create a new item for order",
+                "description": "Create a new item for order"
+            },
+            "parameters": [
+                {
+                    "examples": {
+                        "orderId": {
+                            "value": "123e4567-e89b-12d3-a456-426614174002"
+                        }
+                    },
+                    "name": "orderId",
+                    "description": "Order ID",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
         }
     },
     "components": {
@@ -281,7 +312,7 @@
                 "required": [
                     "isbn",
                     "quantity",
-                    "itemId"
+                    "id"
                 ],
                 "type": "object",
                 "properties": {
@@ -294,7 +325,7 @@
                         "minimum": 1,
                         "type": "integer"
                     },
-                    "itemId": {
+                    "id": {
                         "description": "Unique item ID",
                         "type": "string"
                     }
@@ -434,6 +465,25 @@
                     }
                 },
                 "description": "List of items"
+            },
+            "item": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/item"
+                        },
+                        "examples": {
+                            "item": {
+                                "value": {
+                                    "id": "123e4567-e89b-12d3-a456-426614174222",
+                                    "isbn": "111111",
+                                    "quantity": 1
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Item info"
             }
         }
     }

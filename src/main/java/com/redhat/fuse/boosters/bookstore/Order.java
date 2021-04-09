@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "orders")
 @NamedQuery(name = "findAllOrders", query = "select b from Order b")
-@NamedQuery(name = "findOrderById", query = "select b from Order b where b.id = :id")
+@NamedQuery(name = "findOrderById", query = "select b from Order b where b.id = :orderId")
 public class Order implements Serializable {
 
     @Id
