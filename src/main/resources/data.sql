@@ -1,2 +1,2 @@
-INSERT INTO books (isbn, title, author, publisher, genre) VALUES ('1234', 'The Shining', 'Stephen King', 'Horror');
-INSERT INTO books (isbn, title, author, publisher, genre) VALUES ('3456', 'The Name of the Wind', 'Patrick Rothfuss', 'Fantasy');
+INSERT INTO books (isbn, title, author, publisher, genre) VALUES ('1234', 'The Shining', 'Stephen King', 'Random House', 'Horror');
+INSERT INTO books (isbn, title, author, publisher, genre) VALUES ('3456', 'The Name of the Wind', 'Patrick Rothfuss', 'Columbia', 'Fantasy');
